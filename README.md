@@ -19,10 +19,9 @@ https://www.youtube.com/watch?v=XUw7pR026co
 5. Helm chart for installing and testing the app
 
 ### Setup Guides
-- [Jenkins-on-Docker with K8sAgents-On-K3d](JenkinsOnDocker-K8sAgentsOnK3D.md)
-- [Kaniko + DockerHub](Jenkins-K3d-Kaniko-DockerHub.md)
-- [SonarQube Setup](sonarqube-on-docker.md)
-- [OWASP Integration](jenkins-owasp-dependency-check.md)
+- [Jenkins-on-Docker with K8sAgents-On-K3d](01-JenkinsOnDocker-K8sAgentsOnK3D.md)
+- [Kaniko + DockerHub](03-Jenkins-K3d-Kaniko-DockerHub.md)
+- [SonarQube Setup](02-sonarqube-on-docker.md)
 
 ## Jenkins Workflow
 - Code-Commited to a feature-branch in gitHub - eg: feature/jira-0000-setup-project

@@ -72,21 +72,6 @@ pipeline {
       }
     }
 
-    // This stage triggers fine, but takes super long due to downloading of the vulnerability DB each time.
-    // Disabling it, via parameter, for now.
-    // stage("OWASP Dependency Check") {
-    //   when { 
-    //     allOf {
-    //       expression { params.RUN_SECURITY_SCANS }
-    //       expression { params.RUN_OWASP_SCAN }
-    //     }
-    //   }
-    //   steps {
-    //     dependencyCheck additionalArguments: '--scan ./ --format HTML --prettyPrint', odcInstallation: 'OWASP-DP-Check'
-    //     dependencyCheckPublisher pattern: '**/dependency-check-report.html'
-    //   }
-    // }
-
     stage("OWASP Dependency Check") {
       when { 
         allOf {
@@ -115,7 +100,6 @@ pipeline {
               --prettyPrint \
               --log /tmp/dependency-check.log \
               --nvdValidForHours 5004 \
-              --noupdate
               -l DEBUG
             
             echo "OWASP Dependency Check completed at $(date)"
