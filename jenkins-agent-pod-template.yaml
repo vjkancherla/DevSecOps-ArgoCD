@@ -87,7 +87,8 @@ spec:
     - -c
     - |
       # Fix permissions on mounted volume
-      chown -R $(id -u):$(id -g) /usr/share/dependency-check/data 2>/dev/null || true
+      chown -R dependen:$(id -g) /usr/share/dependency-check/data 2>/dev/null || true
+      chmod 777 /usr/share/dependency-check/data 2>/dev/null || true
       # Keep container alive
       cat
     tty: true
