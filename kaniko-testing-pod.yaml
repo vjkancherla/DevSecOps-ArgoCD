@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: jenkins
+  name: my-custom-jenkins-agent
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: kaniko-secret
+      mountPath: /kaniko/.docker/
+  volumes:
+  - name: kaniko-secret
+    secret:
+      secretName: docker-credentials
+      items:
+      - key: .dockerconfigjson
+        path: config.json
