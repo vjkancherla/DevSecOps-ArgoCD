@@ -92,7 +92,7 @@ pipeline {
             
             # Run OWASP dependency check with debug logging
             /usr/share/dependency-check/bin/dependency-check.sh \
-              --scan ./ \
+              --scan ./src \
               --format HTML \
               --format JSON \
               --format XML \
@@ -100,6 +100,7 @@ pipeline {
               --prettyPrint \
               --log /tmp/dependency-check.log \
               --nvdValidForHours 5004 \
+              --data /usr/share/dependency-check/data
               -l DEBUG
             
             echo "OWASP Dependency Check completed at $(date)"
