@@ -83,7 +83,13 @@ spec:
   - name: owasp-dependency-check
     image: owasp/dependency-check:latest
     command:
-    - cat
+    - sh
+    - -c
+    - |
+      # Fix permissions on mounted volume
+      chown -R $(id -u):$(id -g) /usr/share/dependency-check/data 2>/dev/null || true
+      # Keep container alive
+      cat
     tty: true
     volumeMounts:
       - name: owasp-cache
