@@ -1,7 +1,7 @@
 pipeline {
   agent {
     kubernetes {
-      yamlFile "jenkins-agent-pod-template-2.yaml"
+      yamlFile "jenkins-agent-pod-template.yaml"
     }
   }
 
@@ -74,6 +74,19 @@ pipeline {
 
     // This stage triggers fine, but takes super long due to downloading of the vulnerability DB each time.
     // Disabling it, via parameter, for now.
+    // stage("OWASP Dependency Check") {
+    //   when { 
+    //     allOf {
+    //       expression { params.RUN_SECURITY_SCANS }
+    //       expression { params.RUN_OWASP_SCAN }
+    //     }
+    //   }
+    //   steps {
+    //     dependencyCheck additionalArguments: '--scan ./ --format HTML --prettyPrint', odcInstallation: 'OWASP-DP-Check'
+    //     dependencyCheckPublisher pattern: '**/dependency-check-report.html'
+    //   }
+    // }
+
     stage("OWASP Dependency Check") {
       when { 
         allOf {
@@ -82,8 +95,20 @@ pipeline {
         }
       }
       steps {
-        dependencyCheck additionalArguments: '--scan ./ --format HTML --prettyPrint', odcInstallation: 'OWASP-DP-Check'
-        dependencyCheckPublisher pattern: '**/dependency-check-report.html'
+        container("owasp-dependency-check") {
+          sh '''
+            # Run OWASP dependency check with containerized tool
+            /usr/share/dependency-check/bin/dependency-check.sh \
+              --scan ./ \
+              --format HTML \
+              --format JSON \
+              --format XML \
+              --out ./dependency-check-reports \
+              --prettyPrint \
+              --enableRetired \
+              --enableExperimental
+          '''
+        }
       }
     }
     
@@ -106,7 +131,7 @@ pipeline {
       when { expression { params.RUN_IMAGE_BUILD } }
       steps {
         container("trivy") {
-          sh 'trivy image --input image.tar > trivy-image-scan-${env.BUILD_NUMBER}-results.txt'
+          sh 'trivy image --input image.tar > trivy-image-scan-${BUILD_NUMBER}-results.txt'
         }
       }
     }
@@ -132,7 +157,7 @@ pipeline {
             trivy config \
             --helm-set image.repository=${IMAGE_REPO} \
             --helm-set image.tag=${IMAGE_TAG} \
-            ./helm-chart > trivy-helm-scan-${env.BUILD_NUMBER}-results.txt
+            ./helm-chart > trivy-helm-scan-${BUILD_NUMBER}-results.txt
           '''
         }
       }
@@ -223,6 +248,7 @@ pipeline {
     always {
       archiveArtifacts artifacts: 'trivy-*.txt', allowEmptyArchive: true
       archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'dependency-check-reports/**', allowEmptyArchive: true
     }
   }
 }

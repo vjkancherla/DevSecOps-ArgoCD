@@ -4,6 +4,9 @@ metadata:
   name: jenkins-agent
   namespace: jenkins
 spec:
+  nodeSelector:
+    # Ensure pods run on agent node where volumes (see k3d-volumes.md) are mounted
+    kubernetes.io/hostname: k3d-mycluster-agent-0
   containers:
   - name: jnlp
     image: jenkins/inbound-agent:latest
@@ -33,6 +36,8 @@ spec:
     volumeMounts:
       - name: kaniko-secret
         mountPath: /kaniko/.docker
+      - name: kaniko-cache
+        mountPath: /cache
       - name: workspace-volume
         mountPath: /home/jenkins/agent
 
@@ -75,11 +80,29 @@ spec:
       - name: workspace-volume
         mountPath: /home/jenkins/agent
 
+  - name: owasp-dependency-check
+    image: owasp/dependency-check:latest
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+      - name: owasp-cache
+        mountPath: /usr/share/dependency-check/data
+      - name: workspace-volume
+        mountPath: /home/jenkins/agent
+
   volumes:
   - name: workspace-volume
     emptyDir: {}
   - name: maven-cache
-    emptyDir: {}
+    persistentVolumeClaim:
+      claimName: jenkins-maven-cache-pvc
+  - name: kaniko-cache
+    persistentVolumeClaim:
+      claimName: jenkins-kaniko-cache-pvc
+  - name: owasp-cache
+    persistentVolumeClaim:
+      claimName: jenkins-owasp-cache-pvc
   - name: kaniko-secret
     secret:
       secretName: docker-credentials
