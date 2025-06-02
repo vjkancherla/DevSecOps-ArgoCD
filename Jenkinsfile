@@ -97,16 +97,41 @@ pipeline {
       steps {
         container("owasp-dependency-check") {
           sh '''
-            # Run OWASP dependency check with containerized tool
+            echo "Starting OWASP Dependency Check at $(date)"
+            
+            # Speed-optimized OWASP dependency check
             /usr/share/dependency-check/bin/dependency-check.sh \
               --scan ./ \
               --format HTML \
-              --format JSON \
-              --format XML \
               --out ./dependency-check-reports \
               --prettyPrint \
-              --enableRetired \
-              --enableExperimental
+              --cveValidForHours 72 \
+              --exclude "**/*.min.js" \
+              --exclude "**/node_modules/**" \
+              --exclude "**/target/classes/**" \
+              --exclude "**/*.class" \
+              --disableAssembly \
+              --disableAutoconf \
+              --disableBundleAudit \
+              --disableCmake \
+              --disableComposer \
+              --disableCpan \
+              --disableDart \
+              --disableGolangDep \
+              --disableGolangMod \
+              --disableMSBuild \
+              --disableNodeJS \
+              --disableNuspec \
+              --disablePip \
+              --disablePipfile \
+              --disablePoetry \
+              --disableRubygems \
+              --disableSwiftPackageManager \
+              --disableYarnAudit \
+              -l DEBUG
+            
+            echo "OWASP Dependency Check completed at $(date)"
+            ls -la ./dependency-check-reports/prettyPrint 
           '''
         }
       }

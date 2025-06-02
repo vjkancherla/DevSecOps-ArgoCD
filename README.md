@@ -1,5 +1,8 @@
 # Spring PetClinic Sample Application With DevSecops Pipeline
 
+## See this document: [START-HERE](START-HERE.md)
+
+
 ## Original Source
 I have adapted the project from the original: <br> 
 https://github.com/Aj7Ay/Petclinic-Real <br>
