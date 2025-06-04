@@ -81,7 +81,7 @@ sed -i '' "s|server: .*|server: https://${K3D_IP}:6443|g" k3d-kubeconfig
 kubectl create ns jenkins
 ```
 
-#### Create Service Account and Authentication
+#### [OPTIONAL] Create Service Account and Authentication
 ```bash
 # Create service account
 kubectl create serviceaccount -n jenkins jenkins-sa
@@ -141,65 +141,7 @@ docker volume create sonarqube-data
 
 ### Step 2: Deploy Jenkins and SonarQube
 
-Create a `docker-compose.yaml` file:
-
-```yaml
-services:
-  jenkins:
-    image: bitnami/jenkins:2.504.1
-    container_name: jenkins-docker
-    ports:
-      - "8080:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins-data:/bitnami/jenkins/home
-    environment:
-      - TZ=Europe/London
-    networks:
-      mycluster:
-        ipv4_address: 172.19.0.6
-    restart: unless-stopped
-
-  sonarqube:
-    image: sonarqube:9.9.8-community
-    container_name: sonarqube
-    ports:
-      - "9000:9000"
-      - "9092:9092"
-    volumes:
-      - sonarqube-data:/opt/sonarqube/data
-    environment:
-      - TZ=Europe/London
-    networks:
-      mycluster:
-        ipv4_address: 172.19.0.7
-    restart: unless-stopped
-
-volumes:
-  jenkins-data:
-    driver: local
-    name: jenkins-data
-    labels:
-      - "purpose=jenkins-production"
-      - "backup=required"
-      - "project=ci-cd"
-      - "environment=local-dev"
-      - "created-by=docker-compose"
-  sonarqube-data:
-    driver: local
-    name: sonarqube-data
-    labels:
-      - "purpose=sonarqube-production"
-      - "backup=required"
-      - "project=code-quality"
-      - "environment=local-dev"
-      - "created-by=docker-compose"
-
-networks:
-  mycluster:
-    external: true
-    name: k3d-mycluster
-```
+See [docker-compose.yaml](docker-compose.yaml)
 
 Start the services:
 ```bash
@@ -334,112 +276,7 @@ Create the SonarQube credential in Jenkins (if not done in Step 4.3):
 
 ### Step 7: Create Jenkins Agent Pod Template
 
-Save this as `jenkins-agent-pod-template.yaml` for reference:
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: jenkins-agent
-  namespace: jenkins
-spec:
-  nodeSelector:
-    kubernetes.io/hostname: k3d-mycluster-agent-0
-  containers:
-  - name: jnlp
-    image: jenkins/inbound-agent:latest
-    args: ['$(JENKINS_SECRET)', '$(JENKINS_NAME)']
-    volumeMounts:
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  - name: maven
-    image: maven:alpine
-    command: [cat]
-    tty: true
-    volumeMounts:
-      - name: maven-cache
-        mountPath: /root/.m2
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    command: [sleep]
-    args: [9999999]
-    tty: true
-    volumeMounts:
-      - name: kaniko-secret
-        mountPath: /kaniko/.docker
-      - name: kaniko-cache
-        mountPath: /cache
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  - name: kubectl-helm
-    image: alpine/k8s:1.26.6
-    command: [cat]
-    tty: true
-    env:
-    - name: KUBECONFIG
-      value: /home/jenkins/agent/kubeconfig
-    volumeMounts:
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  - name: sonar-scanner
-    image: sonarsource/sonar-scanner-cli:latest
-    command: [cat]
-    tty: true
-    volumeMounts:
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  - name: trivy
-    image: aquasec/trivy:0.45.1
-    command: [cat]
-    tty: true
-    volumeMounts:
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  - name: gitleaks
-    image: ghcr.io/gitleaks/gitleaks:v8.26.0
-    command: [cat]
-    tty: true
-    volumeMounts:
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  - name: owasp-dependency-check
-    image: owasp/dependency-check:latest
-    command: [cat]
-    tty: true
-    volumeMounts:
-      - name: owasp-cache
-        mountPath: /usr/share/dependency-check/data
-      - name: workspace-volume
-        mountPath: /home/jenkins/agent
-
-  volumes:
-  - name: workspace-volume
-    emptyDir: {}
-  - name: maven-cache
-    persistentVolumeClaim:
-      claimName: jenkins-maven-cache-pvc
-  - name: kaniko-cache
-    persistentVolumeClaim:
-      claimName: jenkins-kaniko-cache-pvc
-  - name: owasp-cache
-    persistentVolumeClaim:
-      claimName: jenkins-owasp-cache-pvc
-  - name: kaniko-secret
-    secret:
-      secretName: docker-credentials
-      items:
-      - key: .dockerconfigjson
-        path: config.json
-```
+See [jenkins-agent-pod-template.yaml](jenkins-agent-pod-template.yaml)
 
 ### Step 8: Create Multibranch Pipeline
 

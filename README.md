@@ -1,6 +1,7 @@
 # Spring PetClinic Sample Application With DevSecops Pipeline
 
-## See this document: [START-HERE](START-HERE.md)
+## See this document for step-by-step guide to set everything up to run this project locally: 
+- [START-HERE](START-HERE.md)
 
 
 ## Original Source
@@ -15,8 +16,7 @@ https://www.youtube.com/watch?v=XUw7pR026co
    The pod template used for Jenkins Agents is - jenkins-agent-pod-template.yml
 3. Kaniko for building docker images on Kubernetes
 3. Sonarqube on Docker
-4. OWASP dependency check plugin
-5. Helm chart for installing and testing the app
+4. Helm chart for installing and testing the app
 
 ### Setup Guides
 - [Jenkins-on-Docker with K8sAgents-On-K3d](01-JenkinsOnDocker-K8sAgentsOnK3D.md)

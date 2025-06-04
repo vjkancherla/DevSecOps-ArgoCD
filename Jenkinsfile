@@ -72,6 +72,8 @@ pipeline {
       }
     }
 
+    // The OWASP dependency check take LOOONG TIME to run the first time round.
+    // It downloads and caches the NVD database.
     stage("OWASP Dependency Check") {
       when { 
         allOf {
@@ -101,14 +103,10 @@ pipeline {
               --log /tmp/dependency-check.log \
               --nvdValidForHours 5004 \
               --data /usr/share/dependency-check/data
-              -l DEBUG
             
             echo "OWASP Dependency Check completed at $(date)"
             echo "Generated reports:"
             ls -la ./dependency-check-reports/ || echo "No reports generated"
-            
-            echo "Last 50 lines of log file:"
-            tail -50 /tmp/dependency-check.log || echo "No log file found"
           '''
         }
       }
@@ -133,7 +131,7 @@ pipeline {
       when { expression { params.RUN_IMAGE_BUILD } }
       steps {
         container("trivy") {
-          sh 'trivy image --input image.tar > trivy-image-scan-${BUILD_NUMBER}-results.txt'
+          sh 'trivy image --input image.tar > trivy-image-scan-${env.BUILD_NUMBER}-results.txt'
         }
       }
     }
@@ -159,7 +157,7 @@ pipeline {
             trivy config \
             --helm-set image.repository=${IMAGE_REPO} \
             --helm-set image.tag=${IMAGE_TAG} \
-            ./helm-chart > trivy-helm-scan-${BUILD_NUMBER}-results.txt
+            ./helm-chart > trivy-helm-scan-${env.BUILD_NUMBER}-results.txt
           '''
         }
       }
