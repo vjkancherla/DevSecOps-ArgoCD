@@ -30,6 +30,7 @@ https://www.youtube.com/watch?v=XUw7pR026co
     - code checkout
     - Mvn compile, test and package 
     - sonarqube code analysis 
+    - gitsecrete: scan code for harcoded secrets
     - owasp code analysis
     - build image with Kaniko 
     - scan image with Trivy 
@@ -40,7 +41,7 @@ https://www.youtube.com/watch?v=XUw7pR026co
     - helm-chart live-run 
     - verify app 
     - delete app and namespace 
-    - publish trivy scan reports
+    - publish trivy, gitsecrets and owasp scan reports
 
 
 ## Running petclinic locally
