@@ -248,7 +248,7 @@ pipeline {
     always {
       archiveArtifacts artifacts: 'trivy-*.txt', allowEmptyArchive: true
       archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
-      archiveArtifacts artifacts: 'dependency-check-reports/**', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'dependency-check-reports*', allowEmptyArchive: true
     }
   }
 }
