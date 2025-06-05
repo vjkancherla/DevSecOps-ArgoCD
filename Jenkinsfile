@@ -246,9 +246,22 @@ pipeline {
 
   post {
     always {
-      archiveArtifacts artifacts: 'trivy-*.txt', allowEmptyArchive: true
-      archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
-      archiveArtifacts artifacts: 'dependency-check-report*', allowEmptyArchive: true
+      script {
+        // Archive Trivy reports only if security scans or image builds are enabled
+        if (params.RUN_SECURITY_SCANS || params.RUN_IMAGE_BUILD) {
+          archiveArtifacts artifacts: 'trivy-*.txt', allowEmptyArchive: true
+        }
+        
+        // Archive Gitleaks report only if security scans are enabled
+        if (params.RUN_SECURITY_SCANS) {
+          archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
+        }
+        
+        // Archive OWASP Dependency Check report only if OWASP scan is enabled
+        if (params.RUN_OWASP_SCAN) {
+          archiveArtifacts artifacts: 'dependency-check-report*', allowEmptyArchive: true
+        }
+      }
     }
   }
 }
