@@ -1,3 +1,4 @@
+---
 # Create the persistent volumes
 ---
 apiVersion: v1
@@ -51,6 +52,23 @@ spec:
     type: DirectoryOrCreate
 
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-trivy-cache-pv
+  namespace: jenkins
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data/jenkins-cache/trivy
+    type: DirectoryOrCreate
+
+---
 # Create the persistent volume claims
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -91,4 +109,18 @@ spec:
   resources:
     requests:
       storage: 200Mi
+  storageClassName: manual
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-trivy-cache-pvc
+  namespace: jenkins
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
   storageClassName: manual
