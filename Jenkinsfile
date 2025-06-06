@@ -143,7 +143,12 @@ pipeline {
     }
 
     stage("Scan Image with Trivy") {
-      when { expression { params.RUN_IMAGE_BUILD } }
+       when { 
+        allOf {
+          expression { params.RUN_SECURITY_SCANS }
+          expression { params.RUN_IMAGE_BUILD }
+        }
+      }
       steps {
         container("trivy") {
           sh 'trivy image --input image.tar > trivy-image-scan-results.txt'
@@ -165,7 +170,12 @@ pipeline {
     }
 
     stage("Scan Helm Chart with Trivy") {
-      when { expression { params.RUN_HELM_OPERATIONS } }
+      when { 
+        allOf {
+          expression { params.RUN_SECURITY_SCANS }
+          expression { params.RUN_HELM_OPERATIONS }
+        }
+      }
       steps {
         container("trivy") {
           sh '''
