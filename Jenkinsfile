@@ -205,7 +205,6 @@ pipeline {
               # Update chart version and app version in Chart.yaml
               sed -i "s/^version:.*/version: ${CHART_VERSION}/" ./helm-chart/Chart.yaml
               sed -i "s/^appVersion:.*/appVersion: \"${IMAGE_TAG}\"/" ./helm-chart/Chart.yaml
-              sed -i "s|^annotations:.*|annotations:\\n    metadata.git.commit: ${GIT_COMMIT_HASH_SHORT}|" ./helm-chart/Chart.yaml
               
               # Update default image in values.yaml to point to the newly built image
               sed -i "s|repository:.*|repository: ${IMAGE_REPO}|" ./helm-chart/values.yaml
