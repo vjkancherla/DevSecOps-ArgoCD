@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: petclinic
+  namespace: argo-cd
+spec:
+  project: default
+  source:
+    repoURL: registry-1.docker.io/vjkancherla
+    chart: petclinic
+    # see - https://argo-cd.readthedocs.io/en/stable/user-guide/tracking_strategies/#helm
+    targetRevision: "0.1.*"
+    # No helm values needed - chart already has correct image
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: petclinic-dev
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
