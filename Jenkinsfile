@@ -33,15 +33,14 @@ pipeline {
     CHART_NAME = "petclinic"
     DOCKER_REGISTRY = "registry-1.docker.io"
     
-    // Generate semantic version from git tag or use commit-based version
-    CHART_VERSION = sh(script: """
+  // Generate semantic version from git tag or use commit-based version
+  CHART_VERSION = sh(script: """
       if git describe --tags --exact-match HEAD 2>/dev/null; then
         git describe --tags --exact-match HEAD | sed 's/^v//'
-      else
-        echo "0.1.${BUILD_NUMBER}-${GIT_COMMIT_HASH_SHORT}"
+      else 
+        echo "0.1.${BUILD_NUMBER}+git.${GIT_COMMIT_HASH_SHORT}" // Valid SemVer build metadata
       fi
     """, returnStdout: true).trim()
-  }
 
   stages {
     stage ("Mvn compile, test and package") {
@@ -205,6 +204,7 @@ pipeline {
               # Update chart version and app version in Chart.yaml
               sed -i "s/^version:.*/version: ${CHART_VERSION}/" ./helm-chart/Chart.yaml
               sed -i "s/^appVersion:.*/appVersion: \"${IMAGE_TAG}\"/" ./helm-chart/Chart.yaml
+              sed -i "s|^annotations:.*|annotations:\\n    metadata.git.commit: ${GIT_COMMIT_HASH_SHORT}|" ./helm-chart/Chart.yaml
               
               # Update default image in values.yaml to point to the newly built image
               sed -i "s|repository:.*|repository: ${IMAGE_REPO}|" ./helm-chart/values.yaml
