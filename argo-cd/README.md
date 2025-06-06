@@ -8,5 +8,7 @@ INSTALL ARGOCD
 -n argo-cd \
 -f argo-helm-values.yaml
 
->> k port-forward -n argo-cd svc/dev-argo-cd-argocd-server 8080:80
+>> k port-forward -n argo-cd svc/dev-argo-cd-argocd-server 9080:80
+
+Login using admin/admin (note that the password was set in argo-helm-values.yaml)
 
