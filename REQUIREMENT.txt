@@ -1,0 +1,26 @@
+1. A feature branch is pushed to Origin
+2. Jenkins Multi-Branch pipeline is triggered (Manually) to perform Contineous Integration (CI)
+3. The CI pipeline performs DevSecOps tasks:
+    - code checkout
+    - Mvn compile, test and package 
+    - sonarqube code analysis 
+    - gitsecrete: scan code for harcoded secrets
+    - owasp code analysis
+    - build image with Kaniko 
+    - scan image with Trivy 
+    - publish image to docker-hub, with Kaniko 
+    - scan helm-chart with Trivy
+    - helm-chart dry-run 
+    - package, tag, and publish the helm chart to DockerHub
+    
+4. ArgoCD is configured to watch DockerHub helm repo for updated versions of the helm charts
+
+5. ArgoCD automatically deploys the updated helm chart
+
+
+
+    - manual approval-gate for deployment
+    - helm-chart live-run 
+    - verify app 
+    - delete app and namespace 
+    - publish trivy, gitsecrets and owasp scan reports
