@@ -5,6 +5,11 @@
 
 set -e  # Exit on any error
 
+# Load environment variables safely
+set -a  # Automatically export all variables
+source .env.credentials >/dev/null 2>&1 || true
+set +a
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -98,7 +103,7 @@ stop_docker_services() {
 delete_k3d_cluster() {
     log_info "Deleting k3d cluster: $CLUSTER_NAME"
     
-    if k3d cluster list | grep -q "$CLUSTER_NAME"; then
+    if k3d cluster list | grep -q $CLUSTER_NAME; then
         k3d cluster delete $CLUSTER_NAME
         log_success "Deleted k3d cluster: $CLUSTER_NAME"
     else
@@ -114,7 +119,7 @@ remove_docker_volume() {
     
     log_info "Removing Docker volume: $VOLUME_NAME"
     
-    if docker volume ls | grep -q "$VOLUME_NAME"; then
+    if docker volume ls | grep -q $VOLUME_NAME; then
         docker volume rm $VOLUME_NAME
         log_success "Removed Docker volume: $VOLUME_NAME"
     else
