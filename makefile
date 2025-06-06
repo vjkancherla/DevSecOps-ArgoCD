@@ -1,11 +1,7 @@
 # K3D Development Environment Automation
 # Usage: make <target>
 
-# Include environment variables if .env.credentials exists
-ifneq (,$(wildcard .env.credentials))
 include .env.credentials
-export $(shell sed 's/=.*//' .env.credentials)
-endif
 
 # Set defaults if variables not defined
 CLUSTER_NAME ?= mycluster

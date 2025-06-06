@@ -5,6 +5,11 @@
 
 set -e  # Exit on any error
 
+# Load environment variables safely
+set -a  # Automatically export all variables
+source .env.credentials >/dev/null 2>&1 || true
+set +a
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
