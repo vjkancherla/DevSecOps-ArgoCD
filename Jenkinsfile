@@ -33,15 +33,16 @@ pipeline {
     CHART_NAME = "petclinic"
     DOCKER_REGISTRY = "registry-1.docker.io"
     
-  // Generate semantic version from git tag or use commit-based version
-  CHART_VERSION = sh(script: """
+    // Generate semantic version from git tag or use commit-based version
+    CHART_VERSION = sh(script: """
       if git describe --tags --exact-match HEAD 2>/dev/null; then
         git describe --tags --exact-match HEAD | sed 's/^v//'
       else 
         echo "0.1.${BUILD_NUMBER}+git.${GIT_COMMIT_HASH_SHORT}" // Valid SemVer build metadata
       fi
     """, returnStdout: true).trim()
-
+  }
+  
   stages {
     stage ("Mvn compile, test and package") {
       when { expression { params.RUN_BUILD } }
