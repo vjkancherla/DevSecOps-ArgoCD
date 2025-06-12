@@ -15,7 +15,18 @@ spec:
     server: https://kubernetes.default.svc
     namespace: petclinic-dev
   syncPolicy:
-    automated: {}
+    automated:
+      prune: true        # Enable auto-pruning of resources no longer in Git
+      selfHeal: true     # Enable auto-healing when cluster state drifts from Git
+      allowEmpty: false  # Prevent sync if no resources would be applied
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - PrunePropagationPolicy=foreground  # Ensure proper cleanup order
+      - PruneLast=true                     # Prune resources after sync is complete
+    retry:
+      limit: 5           # Retry failed syncs up to 5 times
+      backoff:
+        duration: 5s     # Initial retry delay
+        factor: 2        # Exponential backoff factor
+        maxDuration: 3m  # Maximum retry delay

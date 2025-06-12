@@ -19,8 +19,4 @@
 
 
 
-    - manual approval-gate for deployment
-    - helm-chart live-run 
-    - verify app 
-    - delete app and namespace 
-    - publish trivy, gitsecrets and owasp scan reports
+  
