@@ -208,11 +208,17 @@ Install the following plugins via **Manage Jenkins → Manage Plugins**:
 
 Navigate to **Dashboard → Manage Jenkins → Security → Manage Credentials → System → Global credentials**
 
-#### 4.1 Create Service Account Token Credential
+#### 4.1 [Optional] Create Service Account Token Credential
 - **Kind**: Secret text
 - **Secret**: Paste the `$JENKINS_TOKEN` from Step 0.1
 - **ID**: `k8s-jenkins-sa-token`
 - **Description**: Service account token for jenkins-sa in k3d
+
+#### 4.1.1 Create KubeConfig Credential
+- **Kind**: Secret File
+- **Secret**: Upload the k3d-kubeconfig file from Step 0.3
+- **ID**: `k3d-kubeconfig`
+- **Description**: KubConfig File to access K3d Cluster
 
 #### 4.2 Create GitHub Credentials
 - **Kind**: Username with password
